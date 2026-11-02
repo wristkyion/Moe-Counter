@@ -1,0 +1,53 @@
+name: Update GitHub Commit Counter
+
+on:
+  schedule:
+    # Daily at 00:17 UTC.
+    - cron: '17 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-commit-counter
+  cancel-in-progress: false
+
+jobs:
+  update-counter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate commit counter SVG
+        env:
+          GITHUB_USERNAME: wristkyion
+          COUNTER_THEME: asoul
+          COUNTER_OUTPUT: commit-counter.svg
+        run: node scripts/generate-commit-counter.js
+
+      - name: Commit updated SVG
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add commit-counter.svg
+          if git diff --cached --quiet; then
+            echo "Counter image is already up to date."
+            exit 0
+          fi
+          git commit -m "chore: update GitHub commit counter"
+          git push
