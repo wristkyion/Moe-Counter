@@ -22,6 +22,6 @@
     <use x="180" xlink:href="#0" />
     <use x="225" xlink:href="#1" />
     <use x="270" xlink:href="#8" />
-    <use x="315" xlink:href="#0" />
+    <use x="315" xlink:href="#1" />
   </g>
 </svg>
